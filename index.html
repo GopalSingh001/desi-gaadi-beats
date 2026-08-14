@@ -6,14 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Desi Gaadi Beats | देशी गाड़ी बीट्स - Indian Highway & Driver Playlists</title>
     <meta name="description" content="Experience authentic Indian Driver Playlists - Auto Rickshaw Bangerz, GT Road Truck Driver Retro, Haryana Roadways Superfast, Kaali Peeli Monsoon & Chai Tapri Lo-fi. Real soundboard, cassette mode & bass boost!" />
-    <meta name="theme-color" content="#0d0e15" />
+    <meta name="theme-color" content="#06070b" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Rozha+One&family=Space+Grotesk:wght@400;500;600;700&family=Teko:wght@500;600;700&family=Yatra+One&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN Fallback for 100% Guaranteed Instant Styling in Dev & Prod -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              desiAmber: '#f59e0b',
+              desiRed: '#ef4444',
+              desiGreen: '#10b981',
+              desiBlue: '#3b82f6',
+              desiPurple: '#8b5cf6',
+              desiPink: '#ec4899'
+            },
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+              desi: ['Outfit', 'sans-serif'],
+              mono: ['Space Grotesk', 'monospace']
+            }
+          }
+        }
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-[#05070c] text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

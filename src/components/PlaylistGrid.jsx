@@ -1,8 +1,10 @@
 import React from 'react';
 import { playlists, allSongs } from '../data/playlistsData';
+import { soundboardEffects } from '../data/soundboardData';
 import { PlaylistCard } from './PlaylistCard';
 import { useAudio } from '../context/AudioContext';
-import { Play, Sparkles, Flame, Heart } from 'lucide-react';
+import { Play, Sparkles, Flame, Volume2, Heart } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 const categories = [
   { id: 'All', labelEn: 'All Playlists', labelHi: 'सभी प्लेलिस्ट्स' },
@@ -25,7 +27,8 @@ export const PlaylistGrid = () => {
     isPlaying,
     language,
     toggleLikeSong,
-    isSongLiked
+    isSongLiked,
+    triggerSoundEffect
   } = useAudio();
 
   const filteredPlaylists = playlists.filter(p => {
@@ -43,10 +46,21 @@ export const PlaylistGrid = () => {
 
   const trendingSingles = allSongs.slice(0, 6);
 
+  const handleHornClick = (effect) => {
+    triggerSoundEffect(effect.action);
+    if (effect.id === 'pressure-horn' || effect.id === 'desi-seeti') {
+      confetti({
+        particleCount: 20,
+        spread: 45,
+        origin: { y: 0.8 }
+      });
+    }
+  };
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       
-      {/* Category Pills Slider */}
+      {/* Category Pills Bar */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
         {categories.map(cat => {
           const isSelected = selectedCategory === cat.id;
@@ -56,7 +70,7 @@ export const PlaylistGrid = () => {
               onClick={() => setSelectedCategory(cat.id)}
               className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all ${
                 isSelected
-                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 scale-105'
+                  ? 'btn-primary shadow-lg shadow-amber-500/20 scale-105'
                   : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white border border-white/10'
               }`}
             >
@@ -66,16 +80,16 @@ export const PlaylistGrid = () => {
         })}
       </div>
 
-      {/* Playlist Grid */}
+      {/* Playlist Grid Section */}
       <div>
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl md:text-2xl font-black font-desi text-white flex items-center gap-2.5">
+            <h2 className="text-xl md:text-2xl font-bold font-desi text-white flex items-center gap-2.5">
               <Flame className="w-5 h-5 text-amber-400" />
               {language === 'hi' ? 'लोकप्रिय ड्राइवर प्लेलिस्ट्स' : 'Iconic Driver Playlists'}
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {language === 'hi' ? 'हाईवे ड्राइवर्स और कैब उस्तादों की पहली पसंद' : 'Handcrafted for Indian roads, highways, and late-night journeys'}
+            <p className="text-xs text-slate-400 mt-1">
+              {language === 'hi' ? 'हाईवे ड्राइवर्स और कैब उस्तादों की पहली पसंद' : 'Handcrafted authentic collections for road trips and late night drives'}
             </p>
           </div>
           <span className="text-xs text-slate-400 font-mono">
@@ -84,7 +98,7 @@ export const PlaylistGrid = () => {
         </div>
 
         {filteredPlaylists.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredPlaylists.map(playlist => (
               <PlaylistCard key={playlist.id} playlist={playlist} />
             ))}
@@ -102,21 +116,62 @@ export const PlaylistGrid = () => {
         )}
       </div>
 
+      {/* Interactive Quick Soundboard Strip */}
+      <div className="p-6 rounded-3xl bg-[#0e101a] border border-amber-400/20 shadow-xl">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-amber-400/15 text-amber-400 border border-amber-400/30">
+              <Volume2 className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm md:text-base font-bold font-desi text-white">
+                {language === 'hi' ? 'इंस्टेंट प्रेशर हॉर्न पैड (Instant Soundboard)' : 'Instant Highway Horns Pad'}
+              </h3>
+              <p className="text-xs text-slate-400">
+                {language === 'hi' ? 'गाने के साथ कभी भी बजाएं - हॉटकी 1 से 6 दबाएं' : 'Click buttons or press keys [1] to [6] while playing any song'}
+              </p>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-400/10 text-amber-300 font-bold border border-amber-400/25">
+            LIVE SFX ENGINE
+          </span>
+        </div>
+
+        {/* 6 Quick Buttons */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          {soundboardEffects.map((effect) => (
+            <button
+              key={effect.id}
+              onClick={() => handleHornClick(effect)}
+              className="group relative flex flex-col items-center justify-center p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/8 hover:border-amber-400/40 transition transform hover:scale-105 active:scale-95 shadow-sm"
+            >
+              <span className="text-lg mb-1">{effect.icon === 'Truck' ? '🚛' : effect.icon === 'Coffee' ? '☕' : effect.icon === 'Gauge' ? '🛺' : '📢'}</span>
+              <span className="text-xs font-semibold text-slate-200 text-center leading-tight">
+                {language === 'hi' ? effect.hindiName : effect.name}
+              </span>
+              <span className="text-[10px] text-amber-400 font-mono mt-1 font-bold">
+                KEY [{effect.hotkey}]
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Trending Singles Tracklist Grid */}
-      <div className="pt-6 border-t border-white/10">
-        <div className="flex items-center justify-between mb-5">
+      <div className="pt-2">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-black font-desi text-white flex items-center gap-2">
+            <h3 className="text-xl font-bold font-desi text-white flex items-center gap-2.5">
               <Sparkles className="w-5 h-5 text-amber-400 animate-spin-slow" />
-              {language === 'hi' ? 'सुपरहिट देसी सिंगल ट्रैक्स' : 'Trending Highway Hits'}
+              {language === 'hi' ? 'सुपरहिट देसी सिंगल ट्रैक्स' : 'Trending Highway Bangers'}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {language === 'hi' ? 'इंस्टेंट प्ले करें और आनंद लें' : 'Top played single tracks across all vehicle decks'}
+            <p className="text-xs text-slate-400 mt-1">
+              {language === 'hi' ? 'इंस्टेंट प्ले करें और आनंद लें' : 'Most played tracks on Indian roads and highways'}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {trendingSingles.map((song) => {
             const isSongActive = currentSong?.id === song.id;
             const liked = isSongLiked(song.id);
@@ -127,19 +182,19 @@ export const PlaylistGrid = () => {
                 onClick={() => playSong(song)}
                 className={`group cursor-pointer flex items-center justify-between p-3 rounded-2xl border transition-all ${
                   isSongActive
-                    ? 'bg-amber-500/15 border-amber-500/50 shadow-lg shadow-amber-500/10'
-                    : 'bg-[#0f121e]/80 border-white/5 hover:border-white/20 hover:bg-[#141828]'
+                    ? 'bg-amber-400/10 border-amber-400/40 shadow-md'
+                    : 'bg-[#0e101a] border-white/6 hover:border-white/15 hover:bg-[#131622]'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow">
+                  <div className="relative w-11 h-11 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow">
                     <img
                       src={song.coverArt}
                       alt={song.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                      <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
                     </div>
                   </div>
 
@@ -153,7 +208,7 @@ export const PlaylistGrid = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 shrink-0 ml-2">
+                <div className="flex items-center gap-2 shrink-0 ml-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
