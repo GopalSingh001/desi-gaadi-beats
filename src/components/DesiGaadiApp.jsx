@@ -214,26 +214,27 @@ export const DesiGaadiApp = () => {
               <div
                 key={v.id}
                 onClick={() => handleSelectPlaylist(idx)}
-                style={{
-                  borderColor: isSelected ? v.color : undefined
-                }}
-                className={`group cursor-pointer shrink-0 sm:shrink p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 border-2 transform active:scale-95 min-w-[105px] sm:min-w-0 ${
+                className={`group cursor-pointer shrink-0 sm:shrink p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-w-[105px] sm:min-w-0 border-2 ${
                   isSelected
                     ? isDarkMode
-                      ? 'bg-gradient-to-b from-amber-500/20 to-transparent shadow-lg shadow-amber-500/20 scale-105 border-amber-400'
-                      : 'bg-amber-100 border-amber-500 shadow-md scale-105'
+                      ? 'bg-gradient-to-b from-amber-500/25 via-[#161a29] to-[#0c0e18] border-amber-400 shadow-xl shadow-amber-500/25 ring-2 ring-amber-400/40 scale-105'
+                      : 'bg-white border-amber-500 shadow-xl shadow-amber-500/20 ring-2 ring-amber-400/40 scale-105'
                     : isDarkMode
-                      ? 'bg-[#0f121e]/80 hover:bg-[#151928] border-white/8 hover:border-white/20'
+                      ? 'bg-[#0f121e]/90 hover:bg-[#161a29] border-white/8 hover:border-white/20'
                       : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
                 }`}
               >
                 <span className="text-2xl sm:text-3xl mb-1 group-hover:scale-110 transition-transform">
                   {v.icon}
                 </span>
-                <span className={`text-[11px] sm:text-xs font-bold truncate w-full ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                <span className={`text-[11px] sm:text-xs font-black truncate w-full ${
+                  isSelected ? 'text-amber-400 font-black' : isDarkMode ? 'text-white' : 'text-slate-900'
+                }`}>
                   {v.name}
                 </span>
-                <span className={`text-[9px] sm:text-[10px] font-mono mt-0.5 ${isSelected ? 'text-amber-500 font-bold' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className={`text-[9px] sm:text-[10px] font-mono mt-0.5 ${
+                  isSelected ? 'text-amber-400 font-bold' : isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                }`}>
                   {v.count}
                 </span>
               </div>
@@ -388,13 +389,13 @@ export const DesiGaadiApp = () => {
                 <div
                   key={p.id}
                   onClick={() => handleSelectPlaylist(idx)}
-                  className={`group relative cursor-pointer p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl flex flex-col justify-between transition-all duration-300 border ${
+                  className={`group relative cursor-pointer p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl flex flex-col justify-between transition-all duration-300 border-2 ${
                     isCurrentPlaying
                       ? isDarkMode
-                        ? 'bg-amber-500/10 border-amber-400/60 shadow-xl shadow-amber-500/15 scale-[1.02]'
-                        : 'bg-amber-50 border-amber-500 shadow-md scale-[1.02]'
+                        ? 'bg-gradient-to-b from-amber-500/25 via-[#181c2e] to-[#0c0e18] border-amber-400 shadow-2xl shadow-amber-500/25 ring-2 ring-amber-400/50 scale-[1.03]'
+                        : 'bg-white border-amber-500 shadow-xl shadow-amber-500/20 ring-2 ring-amber-400/40 scale-[1.03]'
                       : isDarkMode
-                        ? 'bg-[#0f121e]/80 hover:bg-[#151928] border-white/8 hover:border-white/20'
+                        ? 'bg-[#0f121e]/90 hover:bg-[#151928] border-white/8 hover:border-white/20'
                         : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
                   }`}
                 >
@@ -410,7 +411,9 @@ export const DesiGaadiApp = () => {
                     {/* Floating Button */}
                     <div
                       style={{ backgroundColor: '#f59e0b', color: '#000000' }}
-                      className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform"
+                      className={`absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-lg transition-transform ${
+                        isCurrentPlaying ? 'scale-100 ring-2 ring-amber-300' : 'scale-90 group-hover:scale-100'
+                      }`}
                     >
                       {isCurrentPlaying && isPlaying ? (
                         <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black text-black stroke-[2.5]" />
@@ -422,8 +425,8 @@ export const DesiGaadiApp = () => {
 
                   {/* Info */}
                   <div className="space-y-0.5 sm:space-y-1">
-                    <h4 className={`text-xs sm:text-sm font-black truncate group-hover:text-amber-500 transition-colors ${
-                      isDarkMode ? 'text-white' : 'text-slate-900'
+                    <h4 className={`text-xs sm:text-sm font-black truncate transition-colors ${
+                      isCurrentPlaying ? 'text-amber-400' : isDarkMode ? 'text-white group-hover:text-amber-400' : 'text-slate-900 group-hover:text-amber-500'
                     }`}>
                       {p.name.toUpperCase()}
                     </h4>
