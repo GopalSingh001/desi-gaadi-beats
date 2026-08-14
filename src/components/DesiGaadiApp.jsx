@@ -206,19 +206,19 @@ export const DesiGaadiApp = () => {
       {/* 2. MAIN CONTAINER */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 pb-12">
         
-        {/* A. 5 VEHICLE STRIP */}
-        <div className="flex sm:grid sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        {/* A. 5 VEHICLE STRIP (With py-2 padding to ensure borders are never clipped) */}
+        <div className="flex sm:grid sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3.5 overflow-x-auto py-2 px-1 scrollbar-none">
           {vehicleCategories.map((v, idx) => {
             const isSelected = activeIdx === idx;
             return (
               <div
                 key={v.id}
                 onClick={() => handleSelectPlaylist(idx)}
-                className={`group cursor-pointer shrink-0 sm:shrink p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-300 transform active:scale-95 min-w-[105px] sm:min-w-0 border-2 ${
+                className={`group cursor-pointer shrink-0 sm:shrink p-3.5 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 transform active:scale-95 min-w-[105px] sm:min-w-0 border-2 ${
                   isSelected
                     ? isDarkMode
-                      ? 'bg-gradient-to-b from-amber-500/25 via-[#161a29] to-[#0c0e18] border-amber-400 shadow-xl shadow-amber-500/25 ring-2 ring-amber-400/40 scale-105'
-                      : 'bg-white border-amber-500 shadow-xl shadow-amber-500/20 ring-2 ring-amber-400/40 scale-105'
+                      ? 'bg-gradient-to-b from-amber-500/20 via-[#181c2e] to-[#0c0e18] border-amber-400 shadow-lg shadow-amber-500/20'
+                      : 'bg-white border-amber-500 shadow-md shadow-amber-500/20'
                     : isDarkMode
                       ? 'bg-[#0f121e]/90 hover:bg-[#161a29] border-white/8 hover:border-white/20'
                       : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
@@ -228,7 +228,7 @@ export const DesiGaadiApp = () => {
                   {v.icon}
                 </span>
                 <span className={`text-[11px] sm:text-xs font-black truncate w-full ${
-                  isSelected ? 'text-amber-400 font-black' : isDarkMode ? 'text-white' : 'text-slate-900'
+                  isSelected ? 'text-amber-400' : isDarkMode ? 'text-white' : 'text-slate-900'
                 }`}>
                   {v.name}
                 </span>
@@ -243,7 +243,7 @@ export const DesiGaadiApp = () => {
         </div>
 
         {/* B. HERO SPOTLIGHT WITH REAL YOUTUBE PLAYER */}
-        <div className={`relative rounded-2xl sm:rounded-3xl overflow-hidden border shadow-2xl p-4 sm:p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-8 transition-colors duration-300 ${
+        <div className={`relative rounded-2xl sm:rounded-3xl overflow-hidden border-2 shadow-2xl p-4 sm:p-6 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-8 transition-colors duration-300 ${
           isDarkMode
             ? 'bg-gradient-to-br from-[#121628] via-[#0d101a] to-[#07090e] border-white/10'
             : 'bg-white border-slate-200 shadow-xl'
@@ -314,7 +314,7 @@ export const DesiGaadiApp = () => {
               </span>
             </div>
 
-            {/* ACTION BUTTONS (100% Bright Visible Golden Button) */}
+            {/* Action Buttons */}
             <div className="flex items-center gap-2 sm:gap-3 pt-2 sm:pt-3 flex-wrap">
               <button
                 onClick={handleTogglePlay}
@@ -370,7 +370,7 @@ export const DesiGaadiApp = () => {
 
         </div>
 
-        {/* C. 5 PLAYLISTS GRID */}
+        {/* C. 5 PLAYLISTS GRID (With p-1 padding to ensure no border clipping) */}
         <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between">
             <h3 className={`text-sm sm:text-lg font-black font-desi flex items-center gap-1.5 sm:gap-2 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
@@ -382,18 +382,18 @@ export const DesiGaadiApp = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 p-1">
             {filteredPlaylists.map((p, idx) => {
               const isCurrentPlaying = activeIdx === idx;
               return (
                 <div
                   key={p.id}
                   onClick={() => handleSelectPlaylist(idx)}
-                  className={`group relative cursor-pointer p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl flex flex-col justify-between transition-all duration-300 border-2 ${
+                  className={`group relative cursor-pointer p-3 sm:p-3.5 rounded-xl sm:rounded-2xl flex flex-col justify-between transition-all duration-200 border-2 ${
                     isCurrentPlaying
                       ? isDarkMode
-                        ? 'bg-gradient-to-b from-amber-500/25 via-[#181c2e] to-[#0c0e18] border-amber-400 shadow-2xl shadow-amber-500/25 ring-2 ring-amber-400/50 scale-[1.03]'
-                        : 'bg-white border-amber-500 shadow-xl shadow-amber-500/20 ring-2 ring-amber-400/40 scale-[1.03]'
+                        ? 'bg-gradient-to-b from-amber-500/20 via-[#181c2e] to-[#0c0e18] border-amber-400 shadow-xl shadow-amber-500/20'
+                        : 'bg-white border-amber-500 shadow-lg shadow-amber-500/15'
                       : isDarkMode
                         ? 'bg-[#0f121e]/90 hover:bg-[#151928] border-white/8 hover:border-white/20'
                         : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
