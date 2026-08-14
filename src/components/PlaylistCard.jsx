@@ -1,11 +1,10 @@
 import React from 'react';
-import { Play, Disc3, Sparkles, Volume2 } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
 
 export const PlaylistCard = ({ playlist }) => {
   const {
     currentPlaylist,
-    currentSong,
     isPlaying,
     playSong,
     setCurrentPlaylist,
@@ -28,70 +27,79 @@ export const PlaylistCard = ({ playlist }) => {
     }
   };
 
+  // Get preview cover from first song
+  const previewImage = playlist.songs?.[0]?.coverArt || "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80";
+
   return (
     <div
       onClick={handleCardClick}
-      className="group relative cursor-pointer rounded-3xl bg-[#131622] border border-white/5 hover:border-amber-500/40 p-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-black/80 flex flex-col justify-between overflow-hidden"
+      className="group relative cursor-pointer rounded-2xl glass-card p-4 transition-all duration-300 flex flex-col justify-between overflow-hidden"
     >
-      {/* Background Accent Glow */}
-      <div
-        style={{
-          background: `radial-gradient(circle at top right, ${playlist.accentColor}25 0%, transparent 70%)`
-        }}
-        className="absolute inset-0 pointer-events-none transition-opacity group-hover:opacity-100 opacity-60"
-      />
+      {/* Top Media Cover Box */}
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-4 bg-slate-900/60 shadow-lg">
+        <img
+          src={previewImage}
+          alt={playlist.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        
+        {/* Subtle Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-      {/* Top Header Row */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-3xl shadow-inner group-hover:scale-110 group-hover:border-amber-400/40 transition-transform">
-            {playlist.icon}
-          </div>
-          
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/10 text-amber-300/90 border border-white/10 backdrop-blur-md">
-            {playlist.badge || playlist.category}
+        {/* Vehicle Avatar Icon Badge */}
+        <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 flex items-center justify-center text-xl shadow-md">
+          {playlist.icon}
+        </div>
+
+        {/* Top Right Category Pill */}
+        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-wider text-amber-300 font-mono">
+          {playlist.vehicleType}
+        </div>
+
+        {/* Bottom Tag / Badge inside image */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+          <span className="text-[11px] font-bold text-white/90 drop-shadow-md truncate">
+            {playlist.badge}
           </span>
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-bold font-desi text-white group-hover:text-amber-400 transition-colors leading-snug">
+        {/* Hover Floating Play Button */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-all duration-200">
+          <button
+            onClick={handleQuickPlay}
+            style={{ backgroundColor: playlist.accentColor || '#f59e0b' }}
+            className="w-14 h-14 rounded-full flex items-center justify-center text-slate-950 shadow-2xl shadow-black/90 transform scale-90 group-hover:scale-100 transition-all duration-200 hover:scale-110 active:scale-95"
+            title="Play Playlist"
+          >
+            {isCurrentPlaylistActive && isPlaying ? (
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-4 bg-slate-950 rounded-full animate-bounce" />
+                <span className="w-1.5 h-3 bg-slate-950 rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="w-1.5 h-4 bg-slate-950 rounded-full animate-bounce [animation-delay:0.3s]" />
+              </div>
+            ) : (
+              <Play className="w-6 h-6 fill-slate-950 ml-1" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Info Section */}
+      <div className="space-y-1.5">
+        <h3 className="text-base font-bold font-desi text-white group-hover:text-amber-400 transition-colors truncate">
           {language === 'hi' ? playlist.hindiTitle : playlist.title}
         </h3>
 
-        {/* Tagline / Description */}
-        <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+        <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed h-8">
           {playlist.description}
         </p>
-      </div>
 
-      {/* Footer Info & Quick Play Button */}
-      <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
-        <div className="text-[11px] text-slate-400 space-y-0.5">
-          <div className="font-mono text-slate-300">
-            {playlist.songs?.length || 0} {language === 'hi' ? 'गाने' : 'tracks'}
-          </div>
-          <div className="text-amber-400/80 font-medium">
-            {playlist.stats?.bassLevel || playlist.vehicleType}
-          </div>
+        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+          <span>{playlist.songs?.length || 0} {language === 'hi' ? 'ट्रैक्स' : 'Tracks'}</span>
+          <span className="text-amber-400/90 font-medium truncate max-w-[120px]">
+            {playlist.stats?.bassLevel || playlist.category}
+          </span>
         </div>
-
-        {/* Play Floating Button */}
-        <button
-          onClick={handleQuickPlay}
-          style={{ backgroundColor: playlist.accentColor || '#f59e0b' }}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center text-slate-950 shadow-lg shadow-black/50 transform group-hover:scale-110 transition-transform active:scale-95"
-          title="Play Playlist"
-        >
-          {isCurrentPlaylistActive && isPlaying ? (
-            <div className="flex items-center gap-0.5">
-              <span className="w-1 h-4 bg-slate-950 rounded-full animate-bounce" />
-              <span className="w-1 h-3 bg-slate-950 rounded-full animate-bounce [animation-delay:0.15s]" />
-              <span className="w-1 h-4 bg-slate-950 rounded-full animate-bounce [animation-delay:0.3s]" />
-            </div>
-          ) : (
-            <Play className="w-5 h-5 fill-slate-950 ml-0.5" />
-          )}
-        </button>
       </div>
 
     </div>
