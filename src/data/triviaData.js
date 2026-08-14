@@ -50,7 +50,7 @@ export const driverTrivia = [
     tag: "Acoustic Engineering"
   },
   {
-    title: "Murthal Paratha & Attaullah Khan",
+    title: "Murthal Paratha & Gopal Singh",
     fact: "Between 2 AM and 5 AM on GT Road, truck drivers exclusively play slow-tempo 90s heartbreak cassettes to stay hyper-focused across 800km stretches.",
     tag: "Highway Psychology"
   },

@@ -1,207 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { vehicles } from '../data/playlistsData';
+import { vehicleCategories } from '../data/playlistsData';
 import {
-  Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
-  Shuffle, Repeat, Upload, Sparkles, Flame, Gauge, Disc
+  Search, Volume2, Globe, Play, Pause,
+  Heart, Share2, Star, Clock, Music, Radio,
+  Sparkles, Flame, Sun, Moon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export const DesiGaadiApp = () => {
-  const [vehicleIdx, setVehicleIdx] = useState(0);
-  const [songIdx, setSongIdx] = useState(0);
+  const [activeIdx, setActiveIdx] = useState(3); // Default Barber Shop
+  const [isDarkMode, setIsDarkMode] = useState(true); // Black / White Theme
+  const [searchQuery, setSearchQuery] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [localAudioUrl, setLocalAudioUrl] = useState(null);
-  const [localTitle, setLocalTitle] = useState(null);
-  const [meterFare, setMeterFare] = useState(24.50);
-  const [audioFreqLevel, setAudioFreqLevel] = useState(0.5);
+  const [isLiked, setIsLiked] = useState(true);
+  const [language, setLanguage] = useState('hi');
 
-  const currentVehicle = vehicles[vehicleIdx];
-  const currentSong = localAudioUrl
-    ? {
-        id: 'local',
-        title: localTitle,
-        hindiTitle: localTitle,
-        artist: 'My Device Audio',
-        album: 'Local Song',
-        duration: 'Playing',
-        audioUrl: localAudioUrl,
-        coverArt: currentVehicle.heroImage,
-        tag: 'Local MP3'
-      }
-    : currentVehicle.songs[songIdx];
+  const activePlaylist = vehicleCategories[activeIdx];
 
-  const audioRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const sourceRef = useRef(null);
-  const animFrameRef = useRef(null);
-
-  // Meter Fare ticking for Auto
-  useEffect(() => {
-    if (!isPlaying || currentVehicle.id !== 'auto') return;
-    const interval = setInterval(() => {
-      setMeterFare(prev => +(prev + 1.50).toFixed(2));
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isPlaying, currentVehicle]);
-
-  // Connect Web Audio API Analyser to HTML5 Audio
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-
-    const setupAudioContext = () => {
-      if (!audioContextRef.current) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        audioContextRef.current = new AudioContextClass();
-        analyserRef.current = audioContextRef.current.createAnalyser();
-        analyserRef.current.fftSize = 64;
-
-        try {
-          sourceRef.current = audioContextRef.current.createMediaElementSource(audioElement);
-          sourceRef.current.connect(analyserRef.current);
-          analyserRef.current.connect(audioContextRef.current.destination);
-        } catch (e) {}
-      }
-
-      if (audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume();
-      }
-    };
-
-    const handlePlay = () => {
-      setupAudioContext();
-      setIsPlaying(true);
-    };
-
-    audioElement.addEventListener('play', handlePlay);
-    return () => audioElement.removeEventListener('play', handlePlay);
-  }, []);
-
-  // Audio frequency loop
-  useEffect(() => {
-    const updateFrequency = () => {
-      if (analyserRef.current && isPlaying) {
-        const data = new Uint8Array(analyserRef.current.frequencyBinCount);
-        analyserRef.current.getByteFrequencyData(data);
-        let sum = 0;
-        for (let i = 0; i < 8; i++) sum += data[i];
-        const avg = sum / 8;
-        setAudioFreqLevel(Math.min(1.5, Math.max(0.2, avg / 100)));
-      }
-      animFrameRef.current = requestAnimationFrame(updateFrequency);
-    };
-
-    if (isPlaying) {
-      updateFrequency();
-    } else {
-      setAudioFreqLevel(0.2);
-    }
-
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [isPlaying]);
-
-  // Playback handlers
-  const handleSelectVehicle = (idx) => {
-    setVehicleIdx(idx);
-    setSongIdx(0);
-    setLocalAudioUrl(null);
-    setCurrentTime(0);
+  const handleSelectPlaylist = (idx) => {
+    setActiveIdx(idx);
     setIsPlaying(true);
-
-    confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
-
-    setTimeout(() => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
-      }
-    }, 100);
-  };
-
-  const handleSelectSong = (idx) => {
-    setSongIdx(idx);
-    setLocalAudioUrl(null);
-    setCurrentTime(0);
-    setIsPlaying(true);
-
-    setTimeout(() => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(() => {});
-      }
-    }, 100);
+    confetti({
+      particleCount: 30,
+      spread: 60,
+      origin: { y: 0.7 }
+    });
   };
 
   const handleTogglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
-    }
-  };
-
-  const handleNext = () => {
-    if (localAudioUrl) return;
-    let nextIdx = (songIdx + 1) % currentVehicle.songs.length;
-    if (isShuffle) {
-      nextIdx = Math.floor(Math.random() * currentVehicle.songs.length);
-    }
-    handleSelectSong(nextIdx);
-  };
-
-  const handlePrev = () => {
-    if (localAudioUrl) return;
-    const prevIdx = (songIdx - 1 + currentVehicle.songs.length) % currentVehicle.songs.length;
-    handleSelectSong(prevIdx);
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-      setDuration(audioRef.current.duration || 0);
-    }
-  };
-
-  const handleSeek = (val) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = val;
-      setCurrentTime(val);
-    }
-  };
-
-  const handleVolumeChange = (val) => {
-    setVolume(val);
-    if (audioRef.current) {
-      audioRef.current.volume = val;
-    }
-    setIsMuted(val === 0);
-  };
-
-  const handleToggleMute = () => {
-    if (!audioRef.current) return;
-    if (isMuted) {
-      audioRef.current.volume = volume || 0.8;
-      setIsMuted(false);
-    } else {
-      audioRef.current.volume = 0;
-      setIsMuted(true);
-    }
+    setIsPlaying(!isPlaying);
   };
 
   const handleHorn = () => {
-    confetti({ particleCount: 35, spread: 70, origin: { y: 0.7 } });
+    confetti({
+      particleCount: 30,
+      spread: 70,
+      origin: { y: 0.7 }
+    });
+
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const ctx = new AudioCtx();
@@ -209,12 +45,12 @@ export const DesiGaadiApp = () => {
       const osc2 = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc1.frequency.value = currentVehicle.id === 'truck' ? 190 : currentVehicle.id === 'roadways' ? 260 : 420;
-      osc2.frequency.value = currentVehicle.id === 'truck' ? 280 : currentVehicle.id === 'roadways' ? 390 : 560;
+      osc1.frequency.setValueAtTime(320, ctx.currentTime);
+      osc2.frequency.setValueAtTime(480, ctx.currentTime);
       osc1.type = 'sawtooth';
       osc2.type = 'sawtooth';
 
-      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.setValueAtTime(0.5, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
 
       osc1.connect(gain);
@@ -228,390 +64,364 @@ export const DesiGaadiApp = () => {
     } catch (e) {}
   };
 
-  const handleLocalUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setLocalAudioUrl(url);
-    setLocalTitle(file.name.replace(/\.[^/.]+$/, ""));
-    setCurrentTime(0);
-    setIsPlaying(true);
-
-    setTimeout(() => {
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {});
-      }
-    }, 150);
-
-    confetti({ particleCount: 45, spread: 80, origin: { y: 0.6 } });
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: activePlaylist.name,
+        text: `Listen to ${activePlaylist.name} on Desi Gaadi Beats!`,
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
   };
 
-  const formatTime = (secs) => {
-    if (isNaN(secs) || secs === null) return '0:00';
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-  };
+  const filteredPlaylists = vehicleCategories.filter(p => {
+    const q = searchQuery.toLowerCase().trim();
+    if (q) {
+      return p.name.toLowerCase().includes(q) ||
+        p.hindiName.toLowerCase().includes(q) ||
+        p.tag.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q);
+    }
+    return true;
+  });
 
   return (
-    <div className="space-y-6 pb-24 max-w-6xl mx-auto select-none">
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-[#07090e] text-white' : 'bg-[#f4f6fb] text-slate-900 light-theme'}`}>
       
-      {/* Hidden HTML5 Audio Element */}
-      <audio
-        ref={audioRef}
-        src={currentSong.audioUrl}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleTimeUpdate}
-        onEnded={handleNext}
-        autoPlay={isPlaying}
-      />
-
-      {/* 1. TOP VEHICLE CHANGER TABS */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🚗</span>
-            <span className="text-sm font-bold font-desi text-white">गाड़ी चुनें (Select Vehicle):</span>
+      {/* 1. TOP NAVBAR */}
+      <header className={`sticky top-0 z-40 w-full backdrop-blur-xl border-b px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 transition-colors duration-300 ${
+        isDarkMode ? 'bg-[#080a10]/95 border-white/8' : 'bg-white/95 border-slate-200 shadow-sm'
+      }`}>
+        
+        {/* Logo */}
+        <div className="flex items-center gap-3 shrink-0 cursor-pointer">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 text-xl font-black shadow-md shadow-amber-500/20">
+            🛺
           </div>
-          <span className="text-xs text-amber-400 font-mono font-bold">
-            100% REAL AUDIO
-          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className={`text-base sm:text-lg font-black tracking-tight font-desi ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+                DESI GAADI BEATS
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.2 rounded bg-amber-400/20 text-amber-500 font-bold border border-amber-400/30">
+                PRO
+              </span>
+            </div>
+            <p className={`text-[10px] sm:text-[11px] font-mono tracking-wider hidden sm:block ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              Highway & Driver Audio Network
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          {vehicles.map((v, idx) => {
-            const isSelected = vehicleIdx === idx;
+        {/* Search Bar */}
+        <div className="flex-1 max-w-md mx-4 hidden md:block">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search in 5 playlists..."
+              className={`w-full pl-4 pr-10 py-2 rounded-full border text-xs transition-all outline-none ${
+                isDarkMode
+                  ? 'bg-white/5 hover:bg-white/8 focus:bg-white/10 border-white/10 focus:border-amber-400/50 text-white placeholder-slate-400'
+                  : 'bg-slate-100 hover:bg-slate-200/70 focus:bg-white border-slate-200 focus:border-amber-500 text-slate-900 placeholder-slate-500 shadow-inner'
+              }`}
+            />
+            <Search className={`absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+          </div>
+        </div>
+
+        {/* Actions & Theme Switcher */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          
+          {/* WHITE / BLACK THEME TOGGLE BUTTON */}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition transform active:scale-95 border ${
+              isDarkMode
+                ? 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border-amber-400/30'
+                : 'bg-slate-900 text-white border-slate-800 shadow-sm'
+            }`}
+            title={isDarkMode ? 'Switch to White (Light) Theme' : 'Switch to Black (Dark) Theme'}
+          >
+            {isDarkMode ? (
+              <>
+                <Sun className="w-3.5 h-3.5 text-yellow-400" />
+                <span>White Theme</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3.5 h-3.5 text-amber-300" />
+                <span>Black Theme</span>
+              </>
+            )}
+          </button>
+
+          {/* Horn Button */}
+          <button
+            onClick={handleHorn}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/30 text-xs font-semibold transition transform active:scale-95"
+          >
+            <Volume2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">हॉर्न बजाओ</span>
+          </button>
+
+          {/* Language Switcher */}
+          <button
+            onClick={() => setLanguage(language === 'hi' ? 'en' : 'hi')}
+            className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition ${
+              isDarkMode ? 'bg-white/5 hover:bg-white/10 text-slate-200 border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5 text-slate-400" />
+            <span>{language === 'hi' ? 'हिंदी' : 'EN'}</span>
+          </button>
+
+        </div>
+
+      </header>
+
+      {/* 2. MAIN CONTAINER */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 pb-12">
+        
+        {/* A. 5 VEHICLE STRIP */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          {vehicleCategories.map((v, idx) => {
+            const isSelected = activeIdx === idx;
             return (
-              <button
+              <div
                 key={v.id}
-                onClick={() => handleSelectVehicle(idx)}
-                className={`p-3 rounded-2xl flex flex-col items-center justify-center text-center transition-all transform active:scale-95 border-2 ${
+                onClick={() => handleSelectPlaylist(idx)}
+                style={{
+                  borderColor: isSelected ? v.color : undefined
+                }}
+                className={`group cursor-pointer p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 border-2 transform active:scale-95 ${
                   isSelected
-                    ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-xl shadow-amber-400/25 scale-105'
-                    : 'bg-[#0f121e] hover:bg-[#161a29] text-white border-white/8 hover:border-white/20'
+                    ? isDarkMode
+                      ? 'bg-gradient-to-b from-amber-500/15 to-transparent shadow-lg shadow-amber-500/15 scale-105'
+                      : 'bg-amber-500/15 border-amber-500 shadow-md scale-105'
+                    : isDarkMode
+                      ? 'bg-[#0f121e]/80 hover:bg-[#151928] border-white/8 hover:border-white/20'
+                      : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
                 }`}
               >
-                <span className="text-2xl sm:text-3xl mb-1">{v.icon}</span>
-                <span className="text-xs font-bold truncate w-full">{v.name}</span>
-                <span className={`text-[10px] font-mono mt-0.5 ${isSelected ? 'text-slate-900 font-bold' : 'text-amber-400'}`}>
-                  {v.songs.length} Real Tracks
+                <span className="text-3xl mb-1.5 group-hover:scale-110 transition-transform">
+                  {v.icon}
                 </span>
-              </button>
+                <span className={`text-xs font-bold truncate w-full ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                  {v.name}
+                </span>
+                <span className={`text-[10px] font-mono mt-0.5 ${isSelected ? 'text-amber-500 font-bold' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {v.count}
+                </span>
+              </div>
             );
           })}
         </div>
-      </div>
 
-      {/* 2. MAIN COCKPIT & TRACKLIST DUAL VIEW */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Left (5 Cols): Vehicle Cockpit Stage */}
-        <div className="lg:col-span-5 rounded-3xl bg-[#0c0e18] border border-white/10 p-5 sm:p-6 shadow-2xl space-y-5">
+        {/* B. HERO SPOTLIGHT WITH REAL YOUTUBE PLAYER */}
+        <div className={`relative rounded-3xl overflow-hidden border shadow-2xl p-6 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 transition-colors duration-300 ${
+          isDarkMode
+            ? 'bg-gradient-to-br from-[#121628] via-[#0d101a] to-[#07090e] border-white/10'
+            : 'bg-white border-slate-200 shadow-xl'
+        }`}>
           
-          {/* Vehicle Artwork Frame with Glow */}
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/15 bg-black">
-            <img
-              src={currentSong.coverArt || currentVehicle.heroImage}
-              alt={currentVehicle.name}
-              className={`w-full h-full object-cover ${isPlaying ? 'scale-105' : ''} transition-transform duration-700`}
+          {/* Ambient Glow */}
+          <div
+            style={{ backgroundColor: activePlaylist.color }}
+            className={`absolute -top-24 -left-24 w-96 h-96 rounded-full blur-[140px] pointer-events-none ${isDarkMode ? 'opacity-25' : 'opacity-15'}`}
+          />
+
+          {/* Left: YouTube Video Stage Container */}
+          <div className="relative w-full lg:w-[420px] aspect-video rounded-2xl overflow-hidden shrink-0 border-2 border-white/15 shadow-2xl bg-black">
+            <iframe
+              key={`${activePlaylist.id}-${activePlaylist.youtubeVideoId}`}
+              className="w-full h-full object-cover"
+              src={`https://www.youtube.com/embed/${activePlaylist.youtubeVideoId}?list=${activePlaylist.youtubePlaylistId}&autoplay=${isPlaying ? 1 : 0}&enablejsapi=1&rel=0&modestbranding=1`}
+              title={activePlaylist.name}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-            {/* Top Left Vehicle Badge */}
-            <div className="absolute top-3 left-3 px-3 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 text-xs font-bold text-white flex items-center gap-1.5 shadow">
-              <span className="text-base">{currentVehicle.icon}</span>
-              <span>{currentVehicle.name}</span>
-            </div>
-
-            {/* Top Right Meter */}
-            <div className="absolute top-3 right-3 px-3 py-1 rounded-xl bg-amber-500/20 backdrop-blur-md border border-amber-500/40 text-xs font-mono font-bold text-amber-300 shadow">
-              {currentVehicle.id === 'auto' ? `METER: ₹ ${meterFare.toFixed(2)}` : currentVehicle.meter}
-            </div>
-
-            {/* Live Visualizer Waves on Image */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-center gap-1.5 h-10">
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: isPlaying ? `${Math.min(100, Math.max(15, (audioFreqLevel * 60) + Math.sin(i + Date.now() / 200) * 35))}%` : '15%',
-                    transition: 'height 0.1s ease'
-                  }}
-                  className="w-2 rounded-full bg-gradient-to-t from-amber-500 to-yellow-300 shadow-sm"
-                />
-              ))}
-            </div>
           </div>
 
-          {/* Vehicle Info & Shayari Quote */}
-          <div className="space-y-2">
-            <h2 className="text-xl font-bold font-desi text-white">
-              {currentVehicle.hindiName}
-            </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {currentVehicle.tagline}
+          {/* Right: Info & CTA Controls */}
+          <div className="flex-1 space-y-4 text-left w-full">
+            
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 border ${
+                isDarkMode
+                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                  : 'bg-purple-100 text-purple-700 border-purple-300'
+              }`}>
+                <Sparkles className="w-3.5 h-3.5" />
+                NOW PLAYING
+              </span>
+            </div>
+
+            <div>
+              <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-black font-desi tracking-tight leading-tight ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+                {activePlaylist.name.toUpperCase()}
+              </h1>
+              <p className="text-sm font-semibold text-amber-500 font-mono mt-1">
+                {activePlaylist.hindiName} • {activePlaylist.tag}
+              </p>
+            </div>
+
+            <p className={`text-xs sm:text-sm leading-relaxed max-w-xl ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              {activePlaylist.description}
             </p>
 
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/8 flex items-center justify-between text-xs font-mono">
-              <span className="text-amber-400 font-bold italic">"{currentVehicle.shayari}"</span>
-              <span className="text-slate-400">{currentVehicle.speed}</span>
+            {/* Metadata Row */}
+            <div className={`flex items-center gap-5 text-xs font-mono flex-wrap pt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              <span className={`flex items-center gap-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <Music className="w-3.5 h-3.5 text-amber-500" />
+                {activePlaylist.count}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5" />
+                {activePlaylist.durationText}
+              </span>
+              <span className="flex items-center gap-1">
+                <Radio className="w-3.5 h-3.5" />
+                {activePlaylist.plays}
+              </span>
+              <span className="flex items-center gap-1 text-yellow-500 font-bold">
+                <Star className="w-3.5 h-3.5 fill-current" />
+                {activePlaylist.rating}
+              </span>
             </div>
-          </div>
 
-          {/* Action Buttons: Blast Horn & Upload Custom MP3 */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleHorn}
-              className="p-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 active:scale-95 transition"
-            >
-              <Volume2 className="w-5 h-5 animate-bounce" />
-              <span>हॉर्न बजाओ!</span>
-            </button>
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-3 flex-wrap">
+              <button
+                onClick={handleTogglePlay}
+                className={`flex items-center gap-2.5 px-8 py-3.5 rounded-full font-black text-xs sm:text-sm transition-all transform active:scale-95 shadow-xl ${
+                  isPlaying
+                    ? 'bg-amber-400 text-slate-950 shadow-amber-400/40 ring-4 ring-amber-400/30 scale-105'
+                    : 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-amber-500/25 hover:scale-105'
+                }`}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-4 h-4 fill-slate-950 text-slate-950 stroke-[3]" />
+                    <span className="text-slate-950 font-black tracking-wide">Pause Playlist</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 fill-slate-950 text-slate-950 ml-0.5" />
+                    <span className="text-slate-950 font-black tracking-wide">Play Playlist</span>
+                  </>
+                )}
+              </button>
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="p-3.5 rounded-2xl bg-white/8 hover:bg-white/15 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/12 active:scale-95 transition"
-            >
-              <Upload className="w-4 h-4 text-amber-400" />
-              <span>अपना गाना चलाएं</span>
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="audio/*"
-              onChange={handleLocalUpload}
-              className="hidden"
-            />
+              <button
+                onClick={() => setIsLiked(!isLiked)}
+                className={`flex items-center gap-1.5 px-5 py-3.5 rounded-full font-bold text-xs border transition ${
+                  isDarkMode
+                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-md'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                <span>Save</span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                className={`flex items-center gap-1.5 px-5 py-3.5 rounded-full font-bold text-xs border transition ${
+                  isDarkMode
+                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20 shadow-md'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+                }`}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share</span>
+              </button>
+            </div>
+
           </div>
 
         </div>
 
-        {/* Right (7 Cols): Real Song Tracklist */}
-        <div className="lg:col-span-7 rounded-3xl bg-[#0c0e18] border border-white/10 p-5 sm:p-6 shadow-2xl space-y-4">
-          
-          <div className="flex items-center justify-between pb-3 border-b border-white/8">
-            <div>
-              <h3 className="text-lg font-bold font-desi text-white flex items-center gap-2">
-                <span>{currentVehicle.icon}</span>
-                <span>{currentVehicle.name} - सुपरहिट गाने</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                क्लिक करें और सीधे असली आवाज़ में गाना सुनें
-              </p>
-            </div>
-            <span className="text-xs text-emerald-400 font-mono font-bold">
-              {currentVehicle.songs.length} TRACKS
+        {/* C. 5 PLAYLISTS GRID */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className={`text-base sm:text-lg font-black font-desi flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+              <Flame className="w-5 h-5 text-amber-500" />
+              <span>All 5 Playlists</span>
+            </h3>
+            <span className="text-xs text-amber-500 font-mono font-bold">
+              5 Verified Tracks
             </span>
           </div>
 
-          {/* Tracks List */}
-          <div className="space-y-2.5">
-            {currentVehicle.songs.map((song, idx) => {
-              const isSelected = !localAudioUrl && songIdx === idx;
-
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {filteredPlaylists.map((p, idx) => {
+              const isCurrentPlaying = activeIdx === idx;
               return (
                 <div
-                  key={song.id}
-                  onClick={() => handleSelectSong(idx)}
-                  className={`group cursor-pointer p-3.5 rounded-2xl flex items-center justify-between gap-3 border transition-all ${
-                    isSelected
-                      ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-lg shadow-amber-400/20'
-                      : 'bg-white/5 hover:bg-white/10 text-white border-white/6 hover:border-white/15'
+                  key={p.id}
+                  onClick={() => handleSelectPlaylist(idx)}
+                  className={`group relative cursor-pointer p-3.5 rounded-2xl flex flex-col justify-between transition-all duration-300 border ${
+                    isCurrentPlaying
+                      ? isDarkMode
+                        ? 'bg-amber-500/10 border-amber-400/60 shadow-xl shadow-amber-500/15 scale-[1.02]'
+                        : 'bg-amber-50 border-amber-500 shadow-md scale-[1.02]'
+                      : isDarkMode
+                        ? 'bg-[#0f121e]/80 hover:bg-[#151928] border-white/8 hover:border-white/20'
+                        : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
                   }`}
                 >
-                  {/* Left: Play Icon / Num + Cover + Titles */}
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    
-                    {/* Index or Dancing Equalizer */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-mono font-bold shrink-0 ${
-                      isSelected ? 'bg-slate-950 text-amber-400' : 'bg-white/10 text-slate-300'
-                    }`}>
-                      {isSelected && isPlaying ? (
-                        <div className="flex items-center gap-0.5">
-                          <span className="w-1 h-3 bg-amber-400 rounded-full animate-bounce" />
-                          <span className="w-1 h-2 bg-amber-400 rounded-full animate-bounce [animation-delay:0.15s]" />
-                          <span className="w-1 h-3 bg-amber-400 rounded-full animate-bounce [animation-delay:0.3s]" />
-                        </div>
+                  {/* Artwork with Play/Pause Button */}
+                  <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-black shadow-md">
+                    <img
+                      src={p.coverArt}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+                    {/* Floating Button */}
+                    <div className="absolute bottom-2.5 right-2.5 w-9 h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                      {isCurrentPlaying && isPlaying ? (
+                        <Pause className="w-4 h-4 fill-slate-950" />
                       ) : (
-                        <span>{idx + 1}</span>
+                        <Play className="w-4 h-4 fill-slate-950 ml-0.5" />
                       )}
                     </div>
-
-                    <img
-                      src={song.coverArt}
-                      alt={song.title}
-                      className="w-11 h-11 rounded-xl object-cover border border-white/10 shrink-0 shadow"
-                    />
-
-                    <div className="min-w-0">
-                      <div className="text-xs sm:text-sm font-bold truncate">
-                        {song.hindiTitle || song.title}
-                      </div>
-                      <div className={`text-[11px] truncate mt-0.5 ${isSelected ? 'text-slate-900' : 'text-slate-400'}`}>
-                        {song.artist} • <span className="font-mono">{song.album}</span>
-                      </div>
-                    </div>
-
                   </div>
 
-                  {/* Right: Tag & Duration */}
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full hidden sm:inline ${
-                      isSelected ? 'bg-slate-950/20 text-slate-950 font-bold' : 'bg-white/10 text-slate-300'
+                  {/* Info */}
+                  <div className="space-y-1">
+                    <h4 className={`text-xs sm:text-sm font-black truncate group-hover:text-amber-500 transition-colors ${
+                      isDarkMode ? 'text-white' : 'text-slate-900'
                     }`}>
-                      {song.tag}
-                    </span>
-
-                    <span className={`text-xs font-mono w-10 text-right ${isSelected ? 'text-slate-950' : 'text-slate-400'}`}>
-                      {song.duration}
-                    </span>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isSelected) {
-                          handleTogglePlay();
-                        } else {
-                          handleSelectSong(idx);
-                        }
-                      }}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center transition shadow ${
-                        isSelected ? 'bg-slate-950 text-white' : 'bg-white/10 text-white hover:bg-amber-400 hover:text-slate-950'
-                      }`}
-                    >
-                      {isSelected && isPlaying ? (
-                        <Pause className="w-3.5 h-3.5 fill-current" />
-                      ) : (
-                        <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-                      )}
-                    </button>
+                      {p.name.toUpperCase()}
+                    </h4>
+                    <p className={`text-[11px] truncate ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      {p.hindiName}
+                    </p>
+                    <div className={`flex items-center justify-between text-[10px] font-mono pt-1 ${
+                      isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
+                      <span>{p.count}</span>
+                      <span className="text-yellow-500 font-bold flex items-center gap-0.5">
+                        <Star className="w-3 h-3 fill-current" />
+                        {p.rating}
+                      </span>
+                    </div>
                   </div>
 
                 </div>
               );
             })}
           </div>
-
         </div>
 
-      </div>
-
-      {/* 3. FLOATING LUXURY MUSIC PLAYER DOCK */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 h-22 md:h-24 backdrop-blur-2xl bg-[#090b14]/95 border-t border-white/10 px-4 sm:px-8 flex items-center justify-between gap-3 shadow-2xl">
-        
-        {/* Left: Current Track Thumbnail & Name */}
-        <div className="flex items-center gap-3 w-1/4 min-w-[140px] max-w-[260px]">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-white/10 shadow bg-slate-900">
-            <img
-              src={currentSong.coverArt || currentVehicle.heroImage}
-              alt={currentSong.title}
-              className={`w-full h-full object-cover ${isPlaying ? 'scale-105' : ''} transition-transform duration-500`}
-            />
-          </div>
-          <div className="min-w-0">
-            <div className="text-xs sm:text-sm font-bold text-white truncate">
-              {currentSong.hindiTitle || currentSong.title}
-            </div>
-            <div className="text-[11px] text-slate-400 truncate mt-0.5">
-              {currentSong.artist}
-            </div>
-          </div>
-        </div>
-
-        {/* Center: Controls & Seek Bar */}
-        <div className="flex flex-col items-center justify-center flex-1 max-w-xl px-2">
-          
-          {/* Playback Buttons */}
-          <div className="flex items-center gap-4 mb-1.5">
-            <button
-              onClick={() => setIsShuffle(!isShuffle)}
-              className={`p-1.5 rounded-full transition hidden sm:block ${
-                isShuffle ? 'text-amber-400 bg-amber-400/15' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Shuffle"
-            >
-              <Shuffle className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={handlePrev}
-              className="p-1.5 rounded-full text-slate-300 hover:text-white transition active:scale-95"
-              title="Previous"
-            >
-              <SkipBack className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-            </button>
-
-            <button
-              onClick={handleTogglePlay}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full btn-primary flex items-center justify-center text-slate-950 transition transform hover:scale-105 active:scale-95 shadow-lg shadow-amber-500/25"
-              title={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 fill-slate-950" />
-              ) : (
-                <Play className="w-5 h-5 fill-slate-950 ml-0.5" />
-              )}
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="p-1.5 rounded-full text-slate-300 hover:text-white transition active:scale-95"
-              title="Next"
-            >
-              <SkipForward className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-            </button>
-
-            <button
-              onClick={() => setIsRepeat(!isRepeat)}
-              className={`p-1.5 rounded-full transition hidden sm:block ${
-                isRepeat ? 'text-amber-400 bg-amber-400/15' : 'text-slate-400 hover:text-white'
-              }`}
-              title="Repeat"
-            >
-              <Repeat className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Time Seekbar */}
-          <div className="w-full flex items-center gap-2 text-[11px] font-mono text-slate-400">
-            <span className="w-8 text-right shrink-0">{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              min="0"
-              max={duration || 100}
-              value={currentTime}
-              onChange={(e) => handleSeek(Number(e.target.value))}
-              className="w-full h-1 bg-white/10 rounded-full cursor-pointer accent-amber-400"
-            />
-            <span className="w-8 text-left shrink-0">{formatTime(duration)}</span>
-          </div>
-
-        </div>
-
-        {/* Right: Volume Controls */}
-        <div className="flex items-center justify-end gap-2 w-1/4 min-w-[100px]">
-          <button
-            onClick={handleToggleMute}
-            className="p-1.5 rounded-full text-slate-400 hover:text-white transition"
-          >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="w-4 h-4 text-red-400" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-slate-300" />
-            )}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={isMuted ? 0 : volume}
-            onChange={(e) => handleVolumeChange(Number(e.target.value))}
-            className="w-16 sm:w-20 h-1 bg-white/15 rounded-full cursor-pointer accent-amber-400 hidden sm:block"
-          />
-        </div>
-
-      </div>
+      </main>
 
     </div>
   );

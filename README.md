@@ -10,7 +10,7 @@ An authentic, single-page music streaming React web application built with **Rea
 1. 🛺 **Auto Rickshaw Bass Bangerz (मीटर डाउन 3000)**
    - 90s Mumbai Taxi Remix, DJ Jhankar dholak beats, Mithun disco groove, and street bangers calibrated for under-seat subwoofers.
 2. 🚛 **GT Road Truck Driver Retro (ढाबा सुर & रात का सफर)**
-   - Late-night highway Qawwalis, Attaullah Khan dard-e-dil cassettes, Nusrat trance, and nostalgic retro heartbreak anthems for 3 AM driving.
+   - Late-night highway Qawwalis, Gopal Singh dard-e-dil cassettes, Nusrat trance, and nostalgic retro heartbreak anthems for 3 AM driving.
 3. 🚌 **Haryana & UP Roadways Express (रोडवेज 120 KMPH)**
    - High-bass Ragni EDM, Sapna live stage energy, UP loudspeakers, and adrenaline-pumping pressure horns.
 4. 🚖 **Kaali-Peeli Mumbai Monsoon (काली पीली बारिश और मरीन ड्राइव)**
