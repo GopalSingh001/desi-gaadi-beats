@@ -12,9 +12,6 @@ import {
   Heart,
   Maximize2,
   Radio,
-  Sliders,
-  Sparkles,
-  Zap,
   Disc
 } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
@@ -41,13 +38,8 @@ export const PlayerBar = () => {
     setRepeatMode,
     toggleLikeSong,
     isSongLiked,
-    isBassBoost,
-    toggleBassBoost,
-    isJhankar,
-    toggleJhankar,
     setIsFullScreenPlayerOpen,
     setPlayerMode,
-    setIsSoundboardOpen,
     language
   } = useAudio();
 
@@ -74,10 +66,10 @@ export const PlayerBar = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 h-20 md:h-24 bg-[#0c0e17]/95 border-t border-white/10 backdrop-blur-2xl px-3 md:px-6 flex items-center justify-between shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 z-40 h-20 md:h-24 bg-[#0a0c14]/95 border-t border-white/10 backdrop-blur-2xl px-4 md:px-8 flex items-center justify-between shadow-2xl">
       
-      {/* 1. Left Section: Song Thumbnail & Info */}
-      <div className="flex items-center gap-3 w-1/4 min-w-[140px] max-w-[280px]">
+      {/* Left Section: Song Thumbnail & Meta */}
+      <div className="flex items-center gap-3 w-1/4 min-w-[150px] max-w-[320px]">
         <div
           onClick={() => openPlayerInMode('modern')}
           className="relative group cursor-pointer w-12 h-12 md:w-14 md:h-14 rounded-2xl overflow-hidden shrink-0 border border-white/10 shadow-md"
@@ -87,7 +79,7 @@ export const PlayerBar = () => {
             alt={currentSong.title}
             className={`w-full h-full object-cover ${isPlaying ? 'scale-105' : ''} transition-transform duration-500`}
           />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
             <Maximize2 className="w-4 h-4 text-white" />
           </div>
         </div>
@@ -99,20 +91,21 @@ export const PlayerBar = () => {
           >
             {language === 'hi' ? currentSong.hindiTitle : currentSong.title}
           </div>
-          <div className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
+          <div className="text-[11px] text-slate-400 truncate mt-0.5">
             <span>{currentSong.artist}</span>
           </div>
         </div>
 
         <button
           onClick={() => toggleLikeSong(currentSong.id)}
-          className="hidden sm:block p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-rose-400 transition ml-1"
+          className="hidden sm:block p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-rose-400 transition ml-1 shrink-0"
+          title={liked ? "Remove from Liked" : "Like Track"}
         >
           <Heart className={`w-4 h-4 ${liked ? 'fill-rose-500 text-rose-500' : ''}`} />
         </button>
       </div>
 
-      {/* 2. Middle Section: Playback Controls & Progress Bar */}
+      {/* Middle Section: Playback Controls & Progress Bar */}
       <div className="flex-1 max-w-xl mx-2 md:mx-6 flex flex-col items-center justify-center">
         
         {/* Buttons Row */}
@@ -138,10 +131,10 @@ export const PlayerBar = () => {
             <SkipBack className="w-5 h-5 fill-slate-300" />
           </button>
 
-          {/* Play/Pause Main Button */}
+          {/* Play/Pause Button */}
           <button
             onClick={togglePlay}
-            className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/25 transition transform hover:scale-105 active:scale-95"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/30 transition transform hover:scale-105 active:scale-95"
             title={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
@@ -172,9 +165,9 @@ export const PlayerBar = () => {
           </button>
         </div>
 
-        {/* Seek Progress Bar */}
-        <div className="w-full flex items-center gap-2 text-[10px] font-mono text-slate-400">
-          <span className="w-8 text-right">{formatTime(currentTime)}</span>
+        {/* Progress Bar & Time */}
+        <div className="w-full flex items-center gap-3 text-[10px] font-mono text-slate-400">
+          <span className="w-8 text-right font-bold">{formatTime(currentTime)}</span>
           <input
             type="range"
             min={0}
@@ -183,13 +176,13 @@ export const PlayerBar = () => {
             onChange={(e) => handleSeek(Number(e.target.value))}
             className="w-full"
           />
-          <span className="w-8">{formatTime(duration)}</span>
+          <span className="w-8 font-bold">{formatTime(duration)}</span>
         </div>
 
       </div>
 
-      {/* 3. Right Section: Equalizer status, Soundboard, Expander Modes & Volume */}
-      <div className="flex items-center justify-end gap-2 md:gap-3 w-1/4 min-w-[120px]">
+      {/* Right Section: Visualizer, Modes & Volume */}
+      <div className="flex items-center justify-end gap-2 md:gap-3 w-1/4 min-w-[130px]">
         
         {/* Live Audio Visualizer Mini Preview */}
         <div
@@ -197,13 +190,13 @@ export const PlayerBar = () => {
           className="hidden xl:block cursor-pointer"
           title="Open Fullscreen Visualizer"
         >
-          <AudioVisualizer barCount={14} height={28} width={70} color="#f59e0b" />
+          <AudioVisualizer barCount={16} height={28} width={75} color={currentPlaylist?.accentColor || '#f59e0b'} />
         </div>
 
-        {/* Cassette Mode Button */}
+        {/* 90s Cassette Mode Button */}
         <button
           onClick={() => openPlayerInMode('cassette')}
-          className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-amber-300 hover:text-amber-200 transition border border-white/5"
+          className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-amber-300 hover:text-amber-200 transition border border-white/10"
           title="90s Cassette Deck Mode"
         >
           <Radio className="w-4 h-4" />
@@ -212,7 +205,7 @@ export const PlayerBar = () => {
         {/* Highway Dashcam Mode Button */}
         <button
           onClick={() => openPlayerInMode('highway')}
-          className="hidden sm:flex p-2 rounded-xl bg-white/5 hover:bg-white/15 text-emerald-300 hover:text-emerald-200 transition border border-white/5"
+          className="hidden sm:flex p-2 rounded-xl bg-white/5 hover:bg-white/15 text-emerald-300 hover:text-emerald-200 transition border border-white/10"
           title="Highway Night Drive Mode"
         >
           <Disc className="w-4 h-4 animate-spin-slow" />

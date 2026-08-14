@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Heart, Music, Radio, Volume2, Sliders, Plus, Disc3, Sparkles, X, ChevronRight } from 'lucide-react';
+import { Home, Heart, Music, Volume2, Sliders, Plus, ChevronRight, X } from 'lucide-react';
 import { playlists } from '../data/playlistsData';
 import { highwayShayari } from '../data/triviaData';
 import { useAudio } from '../context/AudioContext';
@@ -20,10 +20,10 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
     language
   } = useAudio();
 
-  // Random shayari
   const [shayariIdx, setShayariIdx] = useState(0);
 
-  const handleNextShayari = () => {
+  const handleNextShayari = (e) => {
+    e.stopPropagation();
     setShayariIdx((shayariIdx + 1) % highwayShayari.length);
   };
 
@@ -41,26 +41,26 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
       {isMobileOpen && (
         <div
           onClick={onCloseMobile}
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm md:hidden"
         />
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-40 w-64 md:w-60 lg:w-64 bg-[#0d0f18] border-r border-white/5 flex flex-col justify-between transition-transform duration-300 ease-in-out ${
+        className={`fixed md:static inset-y-0 left-0 z-40 w-72 md:w-64 lg:w-72 bg-[#0c0e17] border-r border-white/10 flex flex-col justify-between transition-transform duration-300 ease-in-out shrink-0 ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex flex-col h-full overflow-y-auto px-4 py-5 space-y-6">
           
           {/* Mobile Close Button */}
-          <div className="flex items-center justify-between md:hidden pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🛺</span>
-              <span className="font-bold text-white font-desi">देसी बीट्स</span>
+          <div className="flex items-center justify-between md:hidden pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">🛺</span>
+              <span className="font-bold text-white font-desi text-lg">देसी बीट्स</span>
             </div>
             <button
               onClick={onCloseMobile}
-              className="p-1.5 rounded-lg bg-white/5 text-slate-400"
+              className="p-2 rounded-xl bg-white/10 text-slate-300 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -68,8 +68,8 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
 
           {/* Primary Navigation */}
           <div className="space-y-1.5">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
-              {language === 'hi' ? 'नेविगेशन' : 'Menu'}
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2 font-mono">
+              {language === 'hi' ? 'नेविगेशन' : 'MAIN MENU'}
             </div>
 
             <button
@@ -77,9 +77,9 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                 setActiveTab('home');
                 if (onCloseMobile) onCloseMobile();
               }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${
                 activeTab === 'home'
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-sm'
                   : 'text-slate-300 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -92,9 +92,9 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                 setActiveTab('liked');
                 if (onCloseMobile) onCloseMobile();
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${
                 activeTab === 'liked'
-                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-sm'
                   : 'text-slate-300 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -102,7 +102,7 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                 <Heart className="w-4 h-4 text-rose-400" />
                 <span>{language === 'hi' ? 'पसंदीदा गाने' : 'Liked Songs'}</span>
               </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-mono">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-mono font-bold">
                 {likedSongIds.length}
               </span>
             </button>
@@ -112,13 +112,13 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                 setIsSoundboardOpen(true);
                 if (onCloseMobile) onCloseMobile();
               }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition"
             >
               <div className="flex items-center gap-3">
                 <Volume2 className="w-4 h-4 text-red-400" />
                 <span>{language === 'hi' ? 'प्रेशर हॉर्न पैड' : 'Horn Soundboard'}</span>
               </div>
-              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 font-mono">
                 1-6
               </span>
             </button>
@@ -128,7 +128,7 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                 setIsEqualizerOpen(true);
                 if (onCloseMobile) onCloseMobile();
               }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition"
             >
               <div className="flex items-center gap-3">
                 <Sliders className="w-4 h-4 text-emerald-400" />
@@ -140,11 +140,11 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
             </button>
           </div>
 
-          {/* Authentic Playlists */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between px-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                {language === 'hi' ? 'ड्राइवर प्लेलिस्ट' : 'Driver Playlists'}
+          {/* Authentic Driver Playlists */}
+          <div className="space-y-2 pt-2 border-t border-white/5">
+            <div className="px-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                {language === 'hi' ? 'ड्राइवर प्लेलिस्ट्स' : 'DRIVER PLAYLISTS'}
               </span>
             </div>
 
@@ -157,11 +157,11 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
                     onClick={() => handleSelectPlaylist(p)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-left transition ${
                       isSelected
-                        ? 'bg-white/10 text-white font-bold border-l-4 border-amber-500'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                        ? 'bg-white/10 text-amber-400 font-bold border-l-4 border-amber-500'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
                     }`}
                   >
-                    <span className="text-base">{p.icon}</span>
+                    <span className="text-base shrink-0">{p.icon}</span>
                     <span className="truncate flex-1">
                       {language === 'hi' ? p.hindiTitle : p.title}
                     </span>
@@ -172,14 +172,14 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
           </div>
 
           {/* Custom User Playlists */}
-          <div className="space-y-2">
+          <div className="space-y-2 pt-2 border-t border-white/5">
             <div className="flex items-center justify-between px-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                {language === 'hi' ? 'मेरी प्लेलिस्ट्स' : 'My Playlists'}
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                {language === 'hi' ? 'मेरी प्लेलिस्ट्स' : 'MY PLAYLISTS'}
               </span>
               <button
                 onClick={() => setIsCustomPlaylistModalOpen(true)}
-                className="p-1 rounded bg-white/10 hover:bg-white/20 text-amber-400"
+                className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-amber-400 transition"
                 title="Create New Playlist"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -234,24 +234,24 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
             </div>
           </div>
 
-          {/* Highway Shayari Truck Art Widget */}
-          <div
-            onClick={handleNextShayari}
-            className="cursor-pointer p-3.5 rounded-2xl bg-gradient-to-b from-amber-950/40 to-black/60 border border-amber-500/20 hover:border-amber-500/50 transition group"
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+          {/* Highway Shayari Truck Art Card */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-[#181308] via-[#1c160a] to-[#0c0e17] border border-amber-500/30 shadow-lg relative">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 font-mono">
                 <span>{currentShayari.icon}</span>
-                {language === 'hi' ? 'ट्रक शायरी' : 'Highway Quote'}
+                {language === 'hi' ? 'हाईवे शायरी' : 'HIGHWAY QUOTE'}
               </span>
-              <span className="text-[10px] text-slate-400 group-hover:text-amber-300 flex items-center">
-                Next <ChevronRight className="w-3 h-3" />
-              </span>
+              <button
+                onClick={handleNextShayari}
+                className="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-0.5 transition"
+              >
+                Next <ChevronRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <p className="text-xs font-bold text-white font-desi leading-snug">
+            <p className="text-xs font-bold text-white font-desi leading-relaxed mt-1">
               "{language === 'hi' ? currentShayari.hindi : currentShayari.english}"
             </p>
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[10px] text-slate-400 mt-2 font-mono">
               — {currentShayari.author}
             </p>
           </div>
@@ -259,12 +259,12 @@ export const Sidebar = ({ isMobileOpen, onCloseMobile }) => {
         </div>
 
         {/* Status bar */}
-        <div className="p-3 border-t border-white/5 bg-black/40 text-[10px] text-slate-400 flex items-center justify-between">
+        <div className="p-3.5 border-t border-white/10 bg-black/60 text-[10px] text-slate-400 flex items-center justify-between font-mono">
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>STEREO 120 KMPH</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>120 KMPH STEREO</span>
           </div>
-          <span className="font-mono text-amber-400/80">HORN OK PLEASE</span>
+          <span className="text-amber-400 font-bold">HORN OK PLEASE</span>
         </div>
       </aside>
     </>
