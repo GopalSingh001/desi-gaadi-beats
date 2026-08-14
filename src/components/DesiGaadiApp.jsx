@@ -98,7 +98,7 @@ export const DesiGaadiApp = () => {
         
         {/* Logo */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 cursor-pointer">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 text-base sm:text-xl font-black shadow-md shadow-amber-500/20">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-400 flex items-center justify-center text-slate-950 text-base sm:text-xl font-black shadow-md shadow-amber-500/20">
             🛺
           </div>
           <div>
@@ -116,7 +116,7 @@ export const DesiGaadiApp = () => {
           </div>
         </div>
 
-        {/* Search Bar (Tablet / Desktop) */}
+        {/* Search Bar */}
         <div className="flex-1 max-w-md mx-2 sm:mx-4 hidden sm:block">
           <div className="relative">
             <input
@@ -137,25 +137,25 @@ export const DesiGaadiApp = () => {
         {/* Actions & Theme Switcher */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           
-          {/* WHITE / BLACK THEME TOGGLE BUTTON */}
+          {/* THEME TOGGLE BUTTON */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition transform active:scale-95 border ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition transform active:scale-95 border ${
               isDarkMode
-                ? 'bg-amber-400/10 hover:bg-amber-400/20 text-amber-300 border-amber-400/30'
+                ? 'bg-amber-400 text-black border-amber-300 font-black shadow-md'
                 : 'bg-slate-900 text-white border-slate-800 shadow-sm'
             }`}
             title={isDarkMode ? 'Switch to White (Light) Theme' : 'Switch to Black (Dark) Theme'}
           >
             {isDarkMode ? (
               <>
-                <Sun className="w-3.5 h-3.5 text-yellow-400" />
-                <span className="hidden xs:inline">White</span>
+                <Sun className="w-3.5 h-3.5 text-black" />
+                <span>White Mode</span>
               </>
             ) : (
               <>
                 <Moon className="w-3.5 h-3.5 text-amber-300" />
-                <span className="hidden xs:inline">Black</span>
+                <span>Black Mode</span>
               </>
             )}
           </button>
@@ -185,7 +185,7 @@ export const DesiGaadiApp = () => {
 
       </header>
 
-      {/* Mobile Search Bar (Phone Only) */}
+      {/* Mobile Search Bar */}
       <div className="block sm:hidden px-3 pt-3">
         <div className="relative">
           <input
@@ -206,7 +206,7 @@ export const DesiGaadiApp = () => {
       {/* 2. MAIN CONTAINER */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6 sm:space-y-8 pb-12">
         
-        {/* A. 5 VEHICLE STRIP (Responsive Horizontal Scroll on Mobile, Grid on Desktop) */}
+        {/* A. 5 VEHICLE STRIP */}
         <div className="flex sm:grid sm:grid-cols-3 md:grid-cols-5 gap-2.5 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {vehicleCategories.map((v, idx) => {
             const isSelected = activeIdx === idx;
@@ -220,8 +220,8 @@ export const DesiGaadiApp = () => {
                 className={`group cursor-pointer shrink-0 sm:shrink p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-200 border-2 transform active:scale-95 min-w-[105px] sm:min-w-0 ${
                   isSelected
                     ? isDarkMode
-                      ? 'bg-gradient-to-b from-amber-500/15 to-transparent shadow-lg shadow-amber-500/15 scale-105'
-                      : 'bg-amber-500/15 border-amber-500 shadow-md scale-105'
+                      ? 'bg-gradient-to-b from-amber-500/20 to-transparent shadow-lg shadow-amber-500/20 scale-105 border-amber-400'
+                      : 'bg-amber-100 border-amber-500 shadow-md scale-105'
                     : isDarkMode
                       ? 'bg-[#0f121e]/80 hover:bg-[#151928] border-white/8 hover:border-white/20'
                       : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-sm'
@@ -296,42 +296,44 @@ export const DesiGaadiApp = () => {
             {/* Metadata Row */}
             <div className={`flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-mono flex-wrap pt-0.5 sm:pt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
               <span className={`flex items-center gap-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-                <Music className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />
+                <Music className="w-3.5 h-3.5 text-amber-500" />
                 {activePlaylist.count}
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Clock className="w-3.5 h-3.5" />
                 {activePlaylist.durationText}
               </span>
               <span className="flex items-center gap-1">
-                <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Radio className="w-3.5 h-3.5" />
                 {activePlaylist.plays}
               </span>
               <span className="flex items-center gap-1 text-yellow-500 font-bold">
-                <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+                <Star className="w-3.5 h-3.5 fill-current" />
                 {activePlaylist.rating}
               </span>
             </div>
 
-            {/* Action Buttons */}
+            {/* ACTION BUTTONS (100% Bright Visible Golden Button) */}
             <div className="flex items-center gap-2 sm:gap-3 pt-2 sm:pt-3 flex-wrap">
               <button
                 onClick={handleTogglePlay}
-                className={`w-full xs:w-auto flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full font-black text-xs sm:text-sm transition-all transform active:scale-95 shadow-xl ${
-                  isPlaying
-                    ? 'bg-amber-400 text-slate-950 shadow-amber-400/40 ring-4 ring-amber-400/30'
-                    : 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-amber-500/25'
+                style={{
+                  backgroundColor: '#f59e0b',
+                  color: '#000000'
+                }}
+                className={`w-full xs:w-auto flex items-center justify-center gap-2.5 px-7 sm:px-9 py-3.5 rounded-full font-black text-xs sm:text-sm transition-all transform active:scale-95 cursor-pointer shadow-lg border-2 border-amber-300 ${
+                  isPlaying ? 'ring-4 ring-amber-400/40' : 'hover:brightness-110'
                 }`}
               >
                 {isPlaying ? (
                   <>
-                    <Pause className="w-4 h-4 fill-slate-950 text-slate-950 stroke-[3]" />
-                    <span className="text-slate-950 font-black tracking-wide">Pause Playlist</span>
+                    <Pause className="w-4 h-4 fill-black text-black stroke-[3]" />
+                    <span className="text-black font-black tracking-wide uppercase">Pause Playlist</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-4 h-4 fill-slate-950 text-slate-950 ml-0.5" />
-                    <span className="text-slate-950 font-black tracking-wide">Play Playlist</span>
+                    <Play className="w-4 h-4 fill-black text-black ml-0.5" />
+                    <span className="text-black font-black tracking-wide uppercase">Play Playlist</span>
                   </>
                 )}
               </button>
@@ -406,11 +408,14 @@ export const DesiGaadiApp = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                     {/* Floating Button */}
-                    <div className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                    <div
+                      style={{ backgroundColor: '#f59e0b', color: '#000000' }}
+                      className="absolute bottom-2 right-2 sm:bottom-2.5 sm:right-2.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform"
+                    >
                       {isCurrentPlaying && isPlaying ? (
-                        <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-slate-950" />
+                        <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black text-black stroke-[2.5]" />
                       ) : (
-                        <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-slate-950 ml-0.5" />
+                        <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-black text-black ml-0.5" />
                       )}
                     </div>
                   </div>
